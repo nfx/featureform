@@ -12,6 +12,7 @@ import random
 
 import numpy as np
 import pandas as pd
+import grpc
 from pandasql import sqldf
 from featureform.proto import serving_pb2
 from .sqlite_metadata import SQLiteMetadata
@@ -138,7 +139,10 @@ class HostedClientImpl:
             feature_id = req.features.add()
             feature_id.name = name
             feature_id.version = variation
-        resp = self._stub.FeatureServe(req)
+        try:
+            resp = self._stub.FeatureServe(req)
+        except grpc.RpcError as e:
+            raise Exception(f"Code: {e.code()}: {e.details()}") from None
         return [parse_proto_value(val) for val in resp.values]
 
 
@@ -478,7 +482,10 @@ class Stream:
         return self
 
     def __next__(self):
-        return Row(next(self._iter))
+        try:
+            return Row(next(self._iter))
+        except grpc.RpcError as e:
+            raise Exception(f"Code: {e.code()}: {e.details()}") from None
 
     def restart(self):
         self._iter = self._stub.TrainingData(self._req)

@@ -1337,7 +1337,7 @@ class ResourceState:
                     print(resource.name, "already exists.")
                     continue
 
-                raise e
+                raise Exception(f"Code: {e.code()}: {e.details()}")
 
 
 ## Executor Providers
