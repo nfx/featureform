@@ -25,36 +25,12 @@ type SerializedConfig []byte
 
 type ProviderConfig interface {
 	Deserialize(config SerializedConfig) error
-	Serialize() []byte
+	Serialize() ([]byte, error)
 	MutableFields() ss.StringSet
 	DifferingFields(b ProviderConfig) (ss.StringSet, error)
 }
 
-func differingFields(a, b interface{}) (ss.StringSet, error) {
-	diff := ss.StringSet{}
-	aIter, err := si.NewStructIterator(a)
-	if err != nil {
-		return nil, err
-	}
-
-	bMap, err := sm.NewStructMap(b)
-
-	if err != nil {
-		return nil, err
-	}
-
-	for aIter.Next() {
-		key := aIter.Key()
-		aVal := aIter.Value()
-		if !bMap.Has(key, aVal) {
-			diff[key] = true
-		}
-	}
-
-	return diff, nil
-}
-
-func differingFieldsIFace(a, b ProviderConfig) (ss.StringSet, error) {
+func differingFields(a, b ProviderConfig) (ss.StringSet, error) {
 	diff := ss.StringSet{}
 	aIter, err := si.NewStructIterator(a)
 	if err != nil {
