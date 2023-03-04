@@ -30,7 +30,7 @@ func (pg *PostgresConfig) Serialize() []byte {
 	return conf
 }
 
-func (pg PostgresConfig) MutableFields() ss.StringSet {
+func (pg *PostgresConfig) MutableFields() ss.StringSet {
 	return ss.StringSet{
 		"Username": true,
 		"Password": true,
@@ -38,6 +38,6 @@ func (pg PostgresConfig) MutableFields() ss.StringSet {
 	}
 }
 
-func (a PostgresConfig) DifferingFields(b PostgresConfig) (ss.StringSet, error) {
-	return differingFields(a, b)
+func (a *PostgresConfig) DifferingFields(b PostgresConfig) (ss.StringSet, error) {
+	return differingFieldsIFace(*a, b)
 }
